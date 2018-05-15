@@ -11,12 +11,12 @@ class Flecha(pygame.sprite.Sprite):
     self.vy = vel_y
     self.image = pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
-    self.rect.x = pos_x
-    self.rect.y = pos_y
+    self.rect.centerx = pos_x
+    self.rect.centery = pos_y
       
   def move(self):
-    self.rect.x += self.vx
-    self.rect.y += self.vy
+    self.rect.centerx += self.vx
+    self.rect.centery += self.vy
 
     
 class Arco(pygame.sprite.Sprite):
@@ -26,8 +26,8 @@ class Arco(pygame.sprite.Sprite):
     self.original= pygame.image.load(arquivo_imagem)
     self.rotate (start_angle)
     self.rect = self.image.get_rect()
-    self.rect.x = pos_x
-    self.rect.y = pos_y
+    self.rect.centerx = pos_x
+    self.rect.centery = pos_y
     
   def rotate(self, angle):
     self.image = pygame.transform.rotate(self.original, angle)
@@ -39,7 +39,7 @@ pygame.display.set_caption('Arco e Flecha')
 fundo = pygame.image.load("fundo 3.jpg").convert() # Carrega imagem de fundo.
 
 # Cria flecha|arco e adiciona em um grupo de Sprites.
-flecha = Flecha("flecha.png", 100,375,0,0)
+flecha = Flecha("flecha.png", 100,300,0,0)
 flecha_group = pygame.sprite.Group()
 flecha_group.add(flecha)
 
@@ -55,8 +55,8 @@ relogio = pygame.time.Clock()
 
 instante = 0
 Vo=(10000)**(1/2)
-Voy = Vo*math.sin(math.pi/4)
-Vox = Vo*math.cos(math.pi/4)
+Voy = Vo*math.sin(math.pi/6)
+Vox = Vo*math.cos(math.pi/6)
 g = 10
 teta = math.pi/4
 
@@ -66,11 +66,11 @@ while rodando:
     
     pressed_keys = pygame.key.get_pressed()
     if pressed_keys[K_a]:
-        percurso = True;
+        percurso = True
         
     if pressed_keys[K_BACKSPACE]:
-        flecha.rect.x = 100
-        flecha.rect.y = 375
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
         percurso = False
   
 
@@ -81,9 +81,9 @@ while rodando:
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     #Movimento em x e em y
     if percurso == True:
-        Yo=flecha.rect.y
-        flecha.rect.x += Vox*instante
-        flecha.rect.y -= Voy-(g*instante**2)/2
+        Yo=flecha.rect.centery
+        flecha.rect.centerx += Vox*instante
+        flecha.rect.centery -= Voy-(g*instante**2)/2
         Vy=Voy-g*instante
         teta = Vy/Vox
 #        flecha.image = pygame.transform.rotate(flecha.image, teta)
