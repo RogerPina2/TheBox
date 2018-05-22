@@ -79,7 +79,7 @@ percurso = False
 relogio = pygame.time.Clock()   
 
 instante = 0
-Vo=(5000)**(1/2)
+Vo=(11000)**(1/2)
 Voy = Vo*math.sin(math.pi/6)
 Vox = Vo*math.cos(math.pi/6)
 g = 10
@@ -91,8 +91,10 @@ while rodando:
     
     pressed_keys = pygame.key.get_pressed()
     if pressed_keys[K_a]:
+
+        Vo=(11000)**(1/2)
         percurso = True
-        
+    
     if pressed_keys[K_BACKSPACE]:
         flecha.rect.centerx = 100
         flecha.rect.centery = 300
@@ -106,21 +108,21 @@ while rodando:
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     #Movimento em x e em y
     if percurso == True:
+        Voy = Vo*math.sin(math.pi/6)
+        Vox = Vo*math.cos(math.pi/6)
         Yo=flecha.rect.centery
         flecha.rect.centerx += Vox*instante
         flecha.rect.centery -= Voy-(g*instante**2)/2
         Vy=Voy-g*instante
-        teta = Vy/Vox
 #        flecha.image = pygame.transform.rotate(flecha.image, teta)
         instante += 1
 
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
         flecha.rect.centerx=1000
-        flecha.rect.centery=180
         percurso=False
 
     if pygame.sprite.spritecollide(flecha,maca_group,False):
-        if flecha.rect.centery>100:
+       if flecha.rect.centery>100:
             flecha.rect.centerx=1000
             percurso=False
 
@@ -133,9 +135,8 @@ while rodando:
 
     flecha_group.draw(tela) # Pinta a imagem do grupo na tela auxiliar.
     arco_group.draw(tela)
-    maca_group.draw(tela) 
     pessoa_group.draw(tela)
-
+    maca_group.draw(tela)
 
     pygame.display.update() # Troca de tela na janela principal.
 
