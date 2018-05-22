@@ -32,6 +32,24 @@ class Arco(pygame.sprite.Sprite):
   def rotate(self, angle):
     self.image = pygame.transform.rotate(self.original, angle)
 
+class Pessoa(pygame.sprite.Sprite):
+  def __init__(self, arquivo_imagem, pos_x, pos_y):
+    pygame.sprite.Sprite.__init__(self)
+
+    self.image= pygame.image.load(arquivo_imagem)
+    self.rect = self.image.get_rect()
+    self.rect.centerx = pos_x
+    self.rect.centery = pos_y
+
+class Maca(pygame.sprite.Sprite):
+  def __init__(self, arquivo_imagem, pos_x, pos_y):
+    pygame.sprite.Sprite.__init__(self)
+
+    self.image= pygame.image.load(arquivo_imagem)
+    self.rect = self.image.get_rect()
+    self.rect.centerx = pos_x
+    self.rect.centery = pos_y
+
 # ===============   INICIALIZAÇÃO   ===============
 pygame.init()
 tela = pygame.display.set_mode((1200, 600), 0, 32)
@@ -47,6 +65,13 @@ arco = Arco("arco.png", 100, 300, 0)
 arco_group = pygame.sprite.Group()
 arco_group.add(arco)
 
+pessoa = Pessoa("pessoa1.png", 1000, 390)
+pessoa_group = pygame.sprite.Group()
+pessoa_group.add(pessoa)
+
+maca = Maca("maca.png",1000,180)
+maca_group = pygame.sprite.Group()
+maca_group.add(maca)
 
 # ===============   LOOPING PRINCIPAL   ===============
 rodando = True
@@ -54,7 +79,7 @@ percurso = False
 relogio = pygame.time.Clock()   
 
 instante = 0
-Vo=(10000)**(1/2)
+Vo=(5000)**(1/2)
 Voy = Vo*math.sin(math.pi/6)
 Vox = Vo*math.cos(math.pi/6)
 g = 10
@@ -88,13 +113,18 @@ while rodando:
         teta = Vy/Vox
 #        flecha.image = pygame.transform.rotate(flecha.image, teta)
         instante += 1
-        
-        if flecha.rect.x>900:            
-            instante = 0
-            percurso = False
-        if flecha.rect.y>500:
-            instante = 0
-            percurso = False
+
+    if pygame.sprite.spritecollide(flecha,pessoa_group,False):
+        flecha.rect.centerx=1000
+        flecha.rect.centery=180
+        percurso=False
+
+    if pygame.sprite.spritecollide(flecha,maca_group,False):
+        if flecha.rect.centery>100:
+            flecha.rect.centerx=1000
+            percurso=False
+
+
             
 
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
@@ -103,6 +133,9 @@ while rodando:
 
     flecha_group.draw(tela) # Pinta a imagem do grupo na tela auxiliar.
     arco_group.draw(tela)
+    maca_group.draw(tela) 
+    pessoa_group.draw(tela)
+
 
     pygame.display.update() # Troca de tela na janela principal.
 
