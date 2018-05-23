@@ -4,20 +4,46 @@ import numpy as np
 from pygame.locals import *
 
 class Flecha(pygame.sprite.Sprite):
-  def __init__(self, arquivo_imagem, pos_x, pos_y, vel_x, vel_y):
+  def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
 
-    self.vx = vel_x
-    self.vy = vel_y
     self.image = pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
     self.rect.centery = pos_y
+    self.speedx=0
+    self.speedy=0
       
-  def move(self):
-    self.rect.centerx += self.vx
-    self.rect.centery += self.vy
+  def update(self):
 
+    self.speedx=0
+    self.speedy=0
+
+    percurso = False
+    instante = 0
+    Vo=(10000)**(1/2)
+    Voy = Vo*math.sin(math.pi/4)
+    g = 10
+
+    pressed_keys = pygame.key.get_pressed()
+
+    if pressed_keys[K_SPACE]:
+        percurso = True
+
+    while  percurso and pressed_keys[K_SPACE]:
+        self.speedy = Vo*math.sin(math.pi/6)
+        self.speedx = Vo*math.cos(math.pi/6)        
+        if percurso == True:
+            self.rect.centerx += 5
+            self.rect.centery -= 5
+            self.speedy=Voy-g*instante
+            instante += 1
+
+    if pressed_keys[K_r]:
+        self.rect.centerx = 100
+        self.rect.centery = 300
+        instante=0
+        percurso = False
     
 class Arco(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y, start_angle):
@@ -57,7 +83,7 @@ pygame.display.set_caption('Arco e Flecha')
 fundo = pygame.image.load("fundo 3.jpg").convert() # Carrega imagem de fundo.
 
 # Cria flecha|arco e adiciona em um grupo de Sprites.
-flecha = Flecha("flecha.png", 100,300,0,0)
+flecha = Flecha("flecha.png", 100,300)
 flecha_group = pygame.sprite.Group()
 flecha_group.add(flecha)
 
@@ -74,32 +100,14 @@ maca_group = pygame.sprite.Group()
 maca_group.add(maca)
 
 # ===============   LOOPING PRINCIPAL   ===============
-rodando = True
-percurso = False
-relogio = pygame.time.Clock()   
 
-instante = 0
-Vo=(11000)**(1/2)
-Voy = Vo*math.sin(math.pi/6)
-Vox = Vo*math.cos(math.pi/6)
-g = 10
-teta = math.pi/4
+relogio = pygame.time.Clock()   
+    
+rodando = True
 
 while rodando:
     tempo = relogio.tick(15)
     # === PRIMEIRA PARTE: LIDAR COM EVENTOS===   
-    
-    pressed_keys = pygame.key.get_pressed()
-    if pressed_keys[K_a]:
-
-        Vo=(11000)**(1/2)
-        percurso = True
-    
-    if pressed_keys[K_BACKSPACE]:
-        flecha.rect.centerx = 100
-        flecha.rect.centery = 300
-        percurso = False
-  
 
     for event in pygame.event.get(): # Para cada evento não-processado na lista de eventos:
         if event.type == QUIT: # Verifica se o evento atual é QUIT (janela fechou).
@@ -107,27 +115,9 @@ while rodando:
 
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     #Movimento em x e em y
-    if percurso == True:
-        Voy = Vo*math.sin(math.pi/6)
-        Vox = Vo*math.cos(math.pi/6)
-        Yo=flecha.rect.centery
-        flecha.rect.centerx += Vox*instante
-        flecha.rect.centery -= Voy-(g*instante**2)/2
-        Vy=Voy-g*instante
-#        flecha.image = pygame.transform.rotate(flecha.image, teta)
-        instante += 1
 
-    if pygame.sprite.spritecollide(flecha,pessoa_group,False):
-        flecha.rect.centerx=1000
-        percurso=False
-
-    if pygame.sprite.spritecollide(flecha,maca_group,False):
-       if flecha.rect.centery>100:
-            flecha.rect.centerx=1000
-            percurso=False
-
-
-            
+    if pygame.sprite.spritecollide(flecha,pessoa_group,False) or pygame.sprite.spritecollide(flecha,maca_group,False):
+        flecha.rect.centerx=1000         
 
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
 
@@ -138,6 +128,8 @@ while rodando:
     pessoa_group.draw(tela)
     maca_group.draw(tela)
 
+
     pygame.display.update() # Troca de tela na janela principal.
+    flecha_group.update()
 
 pygame.display.quit()
