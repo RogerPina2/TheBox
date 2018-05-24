@@ -1,6 +1,5 @@
 import pygame
 import math
-import numpy as np
 from pygame.locals import *
 
 # ===============   INICIALIZAÇÃO   ===============
@@ -12,7 +11,6 @@ fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
 Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
 
-pressed_keys = pygame.key.get_pressed() # TIRAR
 relogio = pygame.time.Clock()   
 rodando = True
 percurso = False
@@ -85,7 +83,7 @@ pessoa_group.add(pessoa)
 maca_group.add(maca)
     
 # ===============   FUNÇÕES   ===============
-def botão(pos_X, pos_Y, comp, larg, image1, image2, valor):
+def botao(pos_X, pos_Y, comp, larg, image1, image2, valor):
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
     
@@ -106,38 +104,34 @@ def quitgame():
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-    
-    pressed_keys = pygame.key.get_pressed()
-    
+     
     for event in pygame.event.get():
+        if event.type == pygame.QUIT: 
+            rodando = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 valor += 1000
                 print(valor)
 
-            if event.key == pygame.K_SPACE:
+            elif event.key == pygame.K_SPACE:
                 velocidade_inicial=1000+valor
                 Vo=(velocidade_inicial)**(1/2)
                 Voy = Vo*math.sin(math.pi/6)
                 Vox = Vo*math.cos(math.pi/6)
                 percurso = True
     
-            if event.key == pygame.K_r:
+            elif event.key == pygame.K_r:
                 flecha.rect.centerx = 100
                 flecha.rect.centery = 300
                 instante=0
                 valor=0
                 percurso = False
                 
-            if event.key == pygame.K_ESCAPE:
+            elif event.key == pygame.K_ESCAPE:
                 game2 = None
                 game = 'menu'
 
-        if event.type == QUIT: # Verifica se o evento atual é QUIT (janela fechou).
-            rodando = False
-
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
-    #Movimento em x e em y
     if percurso == True:
         Voy = Vo*math.sin(math.pi/6)
         Vox = Vo*math.cos(math.pi/6)
@@ -161,7 +155,7 @@ while rodando:
     if game2 == None:
         if game == 'menu':
             tela.blit(fundo_menu, (0,0))
-            game2 = botão(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo', 'jogo'])
+            game2 = botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo', 'jogo'])
         elif game == 'jogo':
             tela.blit(fundo_jogo, (0,0))
     else:
