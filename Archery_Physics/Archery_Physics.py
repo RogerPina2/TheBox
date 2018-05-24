@@ -17,9 +17,9 @@ percurso = False
 game = 'menu'
 game2 = None    
 
-add_V=0
+incremento_V = 0
+valor_speed = 1
 valor_life = 5
-valor_speed = 0
 instante = 0
 
 # ============== Posições ==================
@@ -117,25 +117,25 @@ def atirar(Vo, teta):
     print(posicoes)
     return posicoes       
     
-def barra_vida(valor_life):
+def barra_vida(life):
  #5 = vida cheia, 0 = morto
     Lx, Ly = 50,100 #Posição inicial da barra de vida
     Bx, By = 20, 20 # Largura e Altura dos 6 blocos da barra de vida
     for i in range (0,5):
-        if i < valor_life:
+        if i < life:
             pygame.draw.rect(tela,(0,255,0), [Lx+Bx*i, Ly, Bx, By])
         else:
             pygame.draw.rect(tela,(255,0,0), [Lx+Bx*i, Ly, Bx, By])
 
-def barra_speed(valor_speed):
+def barra_speed(speed):
  #9 = mais rapido, 0 = mais lento
     Lx, Ly = 25,200 #Posição inicial da barra de velocidade
     Bx, By = 20, 20 #Largura e Altura dos bloco da vida
     for i in range (0,9):
-        if i < valor_life:
-            pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*i, Bx, By])
+        if i < speed:
+            pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(9-i), Bx, By])
         else:
-            pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*i, Bx, By])
+            pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(9-i), Bx, By])
     
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
@@ -146,18 +146,22 @@ while rodando:
             rodando = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                add_V += 5
-                print(add_V)
+                if valor_speed < 9: # 9 é o máximo de incrementos pra velocidade
+                    incremento_V += 5
+                    valor_speed +=1
+                    print(incremento_V)
 
             elif event.key == pygame.K_SPACE:
-                Vo= 60 + add_V
+                Vo= 60 + incremento_V
                 percurso = True
     
             elif event.key == pygame.K_r:
                 flecha.rect.centerx = 100
                 flecha.rect.centery = 300
-                instante=0
-                add_V=0
+                incremento_V = 0
+                valor_speed = 1
+                valor_life = 5
+                instante = 0
                 percurso = False
                 
             elif event.key == pygame.K_ESCAPE:
