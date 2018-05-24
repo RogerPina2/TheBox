@@ -17,13 +17,10 @@ percurso = False
 game = 'menu'
 game2 = None    
 
+add_V=0
 valor_life = 5
 valor_speed = 0
-
-teta = math.pi/4
 instante = 0
-valor=0
-g = 10
 
 # ============== Posições ==================
 flecha_X, flecha_Y = 100, 300
@@ -104,6 +101,22 @@ def quitgame():
     pygame.quit()
     quit()
 
+def atirar(Vo, teta):
+    g = 10
+    Voy = Vo*math.sin(teta)
+    Vox = Vo*math.cos(teta)
+    t = 0
+    posicoes = []
+    X = flecha_X
+    Y = flecha_Y
+    while X < 1200 and Y < 600:
+        X = flecha_X + Vox*t
+        Y = flecha_Y -Voy*t + (g/2)*t**2
+        posicoes.append([int(X),int(Y)])
+        t += 1
+    print(posicoes)
+    return posicoes       
+    
 def barra_vida(valor_life):
  #5 = vida cheia, 0 = morto
     Lx, Ly = 50,100 #Posição inicial da barra de vida
@@ -133,21 +146,18 @@ while rodando:
             rodando = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                valor += 1000
-                print(valor)
+                add_V += 5
+                print(add_V)
 
             elif event.key == pygame.K_SPACE:
-                velocidade_inicial=1000+valor
-                Vo=(velocidade_inicial)**(1/2)
-                Voy = Vo*math.sin(math.pi/6)
-                Vox = Vo*math.cos(math.pi/6)
+                Vo= 60 + add_V
                 percurso = True
     
             elif event.key == pygame.K_r:
                 flecha.rect.centerx = 100
                 flecha.rect.centery = 300
                 instante=0
-                valor=0
+                add_V=0
                 percurso = False
                 
             elif event.key == pygame.K_ESCAPE:
@@ -156,23 +166,21 @@ while rodando:
 
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     if percurso == True:
-        Voy = Vo*math.sin(math.pi/6)
-        Vox = Vo*math.cos(math.pi/6)
-        Yo=flecha.rect.centery
-        flecha.rect.centerx += Vox*instante
-        flecha.rect.centery -= Voy-(g*instante**2)/2
-        Vy=Voy-g*instante
-        instante += 1
+        if instante == 0: 
+            pos_flecha = atirar(Vo,math.pi/6)
+        if instante < len(pos_flecha):
+            flecha.rect.centerx = pos_flecha[instante][0]
+            flecha.rect.centery = pos_flecha[instante][1]
+            instante += 1
 
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
-        flecha.rect.centerx=1000
         percurso=False
-
+        flecha.rect.centerx=1000
+  
     if pygame.sprite.spritecollide(flecha,maca_group,False):
        if flecha.rect.centery>100:
-            flecha.rect.centerx=1000
             percurso=False
-
+            flecha.rect.centerx=1000
 
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
     if game2 == None:
