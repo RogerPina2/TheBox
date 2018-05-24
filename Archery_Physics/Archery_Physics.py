@@ -1,21 +1,39 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 23 16:22:15 2018
-
-@author: roger.pina
-"""
-
 import pygame
 import math
 import numpy as np
 from pygame.locals import *
 
-# ============== Classes ==================
+# ===============   INICIALIZAÇÃO   ===============
+pygame.init()
+tela = pygame.display.set_mode((1200,600), 0,32)
+pygame.display.set_caption('Archery Physics')
+fundo_menu = pygame.image.load('fundo_menu.png').convert()
+fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
+Story_Mode = pygame.image.load("Story-Mode_227x83.png")
+Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
 
+pressed_keys = pygame.key.get_pressed() # TIRAR
+relogio = pygame.time.Clock()   
+rodando = True
+percurso = False
+game = 'menu'
+game2 = None    
+
+teta = math.pi/4
+instante = 0
+valor=0
+g = 10
+
+# ============== Posições ==================
+flecha_X, flecha_Y = 100, 300
+arco_X, arco_Y = 100, 300
+pessoa_X, pessoa_Y = 1000, 390
+maca_X, maca_Y = 1000, 180
+
+# ============== Classes ==================
 class Flecha(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y, vel_x, vel_y):
     pygame.sprite.Sprite.__init__(self)
-
     self.vx = vel_x
     self.vy = vel_y
     self.image = pygame.image.load(arquivo_imagem)
@@ -26,20 +44,17 @@ class Flecha(pygame.sprite.Sprite):
 class Arco(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y, start_angle):
     pygame.sprite.Sprite.__init__(self)
-
     self.original= pygame.image.load(arquivo_imagem)
     self.rotate (start_angle)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
     self.rect.centery = pos_y
-    
   def rotate(self, angle):
     self.image = pygame.transform.rotate(self.original, angle)
 
 class Pessoa(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
-
     self.image= pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
@@ -48,16 +63,28 @@ class Pessoa(pygame.sprite.Sprite):
 class Maca(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
-
     self.image= pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
     self.rect.centery = pos_y
 
-# ===============   FUNÇÕES   ===============
-game = 'menu'
-game2 = None
+# ===============   Sprites e Grupos   ===============
+flecha = Flecha("flecha.png", flecha_X,flecha_Y,0,0)
+arco = Arco("arco.png", arco_X, arco_Y, 0)
+pessoa = Pessoa("pessoa1.png", pessoa_X, pessoa_Y)
+maca = Maca("maca.png",maca_X, maca_Y)
+
+flecha_group = pygame.sprite.Group()
+arco_group = pygame.sprite.Group()
+pessoa_group = pygame.sprite.Group()
+maca_group = pygame.sprite.Group()
+
+flecha_group.add(flecha)
+arco_group.add(arco)
+pessoa_group.add(pessoa)
+maca_group.add(maca)
     
+# ===============   FUNÇÕES   ===============
 def botão(pos_X, pos_Y, comp, larg, image1, image2, valor):
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
@@ -76,49 +103,7 @@ def quitgame():
     pygame.quit()
     quit()
 
-
-# ===============   INICIALIZAÇÃO   ===============
-pygame.init()
-
-tela = pygame.display.set_mode((1200,600), 0,32)
-pygame.display.set_caption('Archery Physics')
-
-fundo_menu = pygame.image.load('fundo_menu.png').convert()
-fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
-
-Story_Mode = pygame.image.load("Story-Mode_227x83.png")
-Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
-    
-
-# Cria flecha|arco e adiciona em um grupo de Sprites.
-flecha = Flecha("flecha.png", 100,300,0,0)
-flecha_group = pygame.sprite.Group()
-flecha_group.add(flecha)
-
-arco = Arco("arco.png", 100, 300, 0)
-arco_group = pygame.sprite.Group()
-arco_group.add(arco)
-
-pessoa = Pessoa("pessoa1.png", 1000, 390)
-pessoa_group = pygame.sprite.Group()
-pessoa_group.add(pessoa)
-
-maca = Maca("maca.png",1000,180)
-maca_group = pygame.sprite.Group()
-maca_group.add(maca)
-        
 # ===============   LOOPING PRINCIPAL   ===============
-relogio = pygame.time.Clock()   
-pressed_keys = pygame.key.get_pressed()
-
-instante = 0
-g = 10
-teta = math.pi/4
-
-rodando = True
-percurso = False
-valor=0
-
 while rodando:
     tempo = relogio.tick(15)
     
@@ -187,5 +172,4 @@ while rodando:
         maca_group.draw(tela)
             
     pygame.display.update()
-    
 pygame.display.quit()
