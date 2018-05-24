@@ -17,6 +17,9 @@ percurso = False
 game = 'menu'
 game2 = None    
 
+valor_life = 5
+valor_speed = 0
+
 teta = math.pi/4
 instante = 0
 valor=0
@@ -101,6 +104,26 @@ def quitgame():
     pygame.quit()
     quit()
 
+def barra_vida(valor_life):
+ #5 = vida cheia, 0 = morto
+    Lx, Ly = 50,100 #Posição inicial da barra de vida
+    Bx, By = 20, 20 # Largura e Altura dos 6 blocos da barra de vida
+    for i in range (0,5):
+        if i < valor_life:
+            pygame.draw.rect(tela,(0,255,0), [Lx+Bx*i, Ly, Bx, By])
+        else:
+            pygame.draw.rect(tela,(255,0,0), [Lx+Bx*i, Ly, Bx, By])
+
+def barra_speed(valor_speed):
+ #9 = mais rapido, 0 = mais lento
+    Lx, Ly = 25,200 #Posição inicial da barra de velocidade
+    Bx, By = 20, 20 #Largura e Altura dos bloco da vida
+    for i in range (0,9):
+        if i < valor_life:
+            pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*i, Bx, By])
+        else:
+            pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*i, Bx, By])
+    
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
@@ -160,6 +183,8 @@ while rodando:
             tela.blit(fundo_jogo, (0,0))
     else:
         tela.blit(fundo_jogo, (0,0))
+        barra_vida(valor_life)
+        barra_speed(valor_speed)
         flecha_group.draw(tela) # Pinta a imagem do grupo na tela auxiliar.
         arco_group.draw(tela)
         pessoa_group.draw(tela)
