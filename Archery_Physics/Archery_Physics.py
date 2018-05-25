@@ -12,17 +12,18 @@ Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
 
 relogio = pygame.time.Clock()   
-rodando = True
-percurso = False
-fim_percurso = False
+rodando = True  #Loop principal do jogo
+percurso = False #True enquanto a flecha estiver em movimento
+fim_percurso = False #True enquanto estiver na posição do final do seu percurso
+segura_W = False #True enquanto pressionar w
+
 game = 'menu'
 game2 = None    
 
-incremento_V = 0
-max_incremento_V = 20
-valor_speed = 1
-valor_life = 3
-instante = 0
+max_V = 100 #máxima incremento a velocidade inicial(Vo = 60)
+valor_speed = 1 #valor da velocidade mostrada na barra (1 a 100)
+valor_life = 3  #valor da vida do personagem (3 a 0)
+instante = 0 #contador pra movimentar a flecha
 
 # ============== Posições ==================
 flecha_X, flecha_Y = 100, 300
@@ -129,14 +130,13 @@ def barra_vida(life):
             pygame.draw.rect(tela,(255,0,0), [Lx+Bx*i, Ly, Bx, By])
 
 def barra_speed(speed):
- #20 = mais rapido, 0 = mais lento
-    Lx, Ly = 25,300 #Posição inicial da barra de velocidade
-    Bx, By = 20, 20 #Largura e Altura dos bloco da vida
-    for i in range (0,20):
+    Lx, Ly = 25,150 #Posição inicial da barra de velocidade
+    Bx, By = 20, 3 #Largura e Altura dos bloco da vida
+    for i in range (0,max_V):
         if i < speed:
-            pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(9-i), Bx, By])
+            pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(max_V-i), Bx, By])
         else:
-            pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(9-i), Bx, By])
+            pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
                 
     
 # ===============   LOOPING PRINCIPAL   ===============
@@ -146,16 +146,21 @@ while rodando:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             rodando = False
+            
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:
+                segura_W  = False
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if valor_speed < max_incremento_V and fim_percurso == False: # 20 é o máximo de incrementos pra velocidade
-                    incremento_V += 5
-                    valor_speed +=1
+                if valor_speed < max_V and fim_percurso == False: 
+                    segura_W = True
 
             elif event.key == pygame.K_SPACE:
                     if fim_percurso == False:
-                        Vo= 60 + incremento_V
+                        Vel= 60 + valor_speed
                         percurso = True
+                        print(valor_speed)
     
             elif event.key == pygame.K_r:
                 percurso = False
@@ -163,7 +168,6 @@ while rodando:
                 flecha.rect.centerx = 100
                 flecha.rect.centery = 300
                 instante = 0
-                incremento_V = 0
                 valor_speed = 1
                 
             elif event.key == pygame.K_ESCAPE:
@@ -172,13 +176,16 @@ while rodando:
 
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     if percurso == True:
-        if instante == 0: 
-            pos_flecha = atirar(Vo,math.pi/6)
-        if instante < len(pos_flecha):
+        if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
+            pos_flecha = atirar(Vel,math.pi/6)
+        if instante < len(pos_flecha): #Move a flecha pela trajetoria calculada
             flecha.rect.centerx = pos_flecha[instante][0]
             flecha.rect.centery = pos_flecha[instante][1]
             instante += 1
 
+    if segura_W == True:
+        valor_speed +=2
+        
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
         fim_percurso = True
         if percurso == True:
