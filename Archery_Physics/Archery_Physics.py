@@ -243,7 +243,11 @@ while rodando:
             percurso=False
             flecha.rect.centery = 180
             flecha.rect.centerx=1000
-        
+    
+    if flecha.rect.centery>600 or flecha.rect.centerx>1200:
+        fim_percurso = True
+        recomeca = True
+
         
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
     
