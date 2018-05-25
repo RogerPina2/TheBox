@@ -33,6 +33,7 @@ percurso = False #True enquanto a flecha estiver em movimento
 fim_percurso = False #True enquanto estiver na posição do final do seu percurso
 gameOver= False #True enquanto jogador nao decidir se continua ou sai depois que perder
 segura_W = False #True enquanto pressionar w
+recomeca = False # True pra reinciar a flecha
 
 max_V = 100 #máxima incremento a velocidade inicial(Vo = 60)
 valor_speed = 1 #valor da velocidade mostrada na barra (1 a 100)
@@ -172,7 +173,16 @@ def acertou():
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-       
+    
+    if recomeca == True:
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        valor_speed = 1
+        instante = 0
+        recomeca = False
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             quitgame()
@@ -184,6 +194,8 @@ while rodando:
             elif event.key == pygame.K_ESCAPE:
                 modos['jogo'] = 0
                 modos['tutorial'] = 0
+                recomeca = True
+                valor_life = 3
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -196,22 +208,12 @@ while rodando:
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     if valor_life == 0:
         modos['game_over'] = 1
+        recomeca = True
         valor_life = 3
-        percurso = False
-        fim_percurso = False
-        flecha.rect.centerx = 100
-        flecha.rect.centery = 300
-        instante = 0
-        valor_speed = 1
         
     if fim_percurso == True:
         time.sleep(1)
-        percurso = False
-        fim_percurso = False
-        flecha.rect.centerx = 100
-        flecha.rect.centery = 300
-        instante = 0
-        valor_speed = 1
+        recomeca = True
         
     if percurso == True:
         if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
@@ -232,14 +234,9 @@ while rodando:
         flecha.rect.centerx=1000    
 
     if pygame.sprite.spritecollide(flecha,maca_group,False):
-        fim_percurso = True
         acertou()
         valor_life = 3
-        percurso = False
-        flecha.rect.centerx = 100
-        flecha.rect.centery = 300
-        instante = 0
-        valor_speed = 1
+        recomeca = True
         
         if flecha.rect.centery>100:
             percurso=False
