@@ -11,7 +11,9 @@ pygame.display.set_caption('Archery Physics')
 fundo_menu = pygame.image.load('fundo_menu.png').convert()
 fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
 fundo_tutorial = pygame.image.load("fundo_tutorial.png")
-fundo_Game_Over = pygame.image.load("Game_Over.png")
+
+Game_Over = pygame.image.load("Game_Over.png")
+You_Win = pygame.image.load("You_Win.png")
 
 Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
@@ -24,6 +26,9 @@ Menu_bright = pygame.image.load("Menu_bright.png")
 
 Jogar_Novamente = pygame.image.load("Jogar_Novamente.png")
 Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_bright.png")
+
+Next_Level = pygame.image.load("Next_Level.png")
+Next_Level_bright = pygame.image.load("Next_Level_bright.png")
 
 font = pygame.font.SysFont(None, 25)
 
@@ -108,11 +113,14 @@ modos = {
     'game_over' : 0,
     'jogar_dnv' : 0,
     'menu' : 0,
+    'win' : 0,
         }
 
-def botao(pos_X, pos_Y, comp, larg, image1, image2, arg, arg2):
+def botao(pos_X, pos_Y, image1, image2, arg, arg2):
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
+    comp = 227
+    larg = 83
     
     if pos_X+comp > mouse[0] > pos_X and pos_Y+larg > mouse[1] > pos_Y:
         tela.blit(image2, (pos_X, pos_Y))
@@ -162,18 +170,10 @@ def barra_speed(speed):
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
  
-def acertou():
-    tela.fill((255,255,255))
-    screen_text = font.render("Acertou!!", True, (0,255,0))
-    tela.blit(screen_text, [600, 300])
-    pygame.display.update()
-    loop = True   
-    time.sleep(2)
-    
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-    
+      
     if recomeca == True:
         percurso = False
         fim_percurso = False
@@ -196,7 +196,7 @@ while rodando:
                 modos['tutorial'] = 0
                 recomeca = True
                 valor_life = 3
-
+                
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
                 segura_W  = False
@@ -208,8 +208,8 @@ while rodando:
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     if valor_life == 0:
         modos['game_over'] = 1
-        recomeca = True
         valor_life = 3
+        recomeca = True
         
     if fim_percurso == True:
         time.sleep(1)
@@ -234,13 +234,16 @@ while rodando:
         flecha.rect.centerx=1000    
 
     if pygame.sprite.spritecollide(flecha,maca_group,False):
-        acertou()
+        fim_percurso = True
+        modos['win'] = 1
         valor_life = 3
         recomeca = True
         
         if flecha.rect.centery>100:
             percurso=False
+            flecha.rect.centery = 180
             flecha.rect.centerx=1000
+        
         
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
     
@@ -256,18 +259,25 @@ while rodando:
         
         if modos['game_over'] == 1:
             flecha_group.draw(tela)
-            tela.blit(fundo_Game_Over, (301,151))
-            botao(350, 310, 227, 83, Menu, Menu_bright, ['jogo','game_over'], [0,0])
-            botao(625, 310, 227, 83, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
-    
+            tela.blit(Game_Over, (301,151))
+            botao(350, 310, Menu, Menu_bright, ['jogo','game_over'], [0,0])
+            botao(625, 310, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
+            
+        elif modos['win'] == 1:
+            flecha_group.draw(tela)
+            maca_group.draw(tela)
+            tela.blit(You_Win, (301,151))
+            botao(350, 310, Menu, Menu_bright, ['jogo','win'], [0,0])
+            botao(625, 310, Next_Level, Next_Level_bright, ['win'], [0])
+        
     elif modos['tutorial'] == 1:
         tela.blit(fundo_tutorial, (0,0))
-        botao(485, 480, 227, 83, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
+        botao(485, 480, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
  
     else: 
         tela.blit(fundo_menu, (0,0))
-        botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo'], [1])
-        botao(480, 310, 227, 83, Tutorial, Tutorial_bright, ['tutorial'], [1])    
+        botao(153, 310, Story_Mode, Story_Mode_bright, ['jogo'], [1])
+        botao(480, 310, Tutorial, Tutorial_bright, ['tutorial'], [1])    
         
     pygame.display.update()
 pygame.display.quit()
