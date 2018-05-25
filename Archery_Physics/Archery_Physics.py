@@ -15,6 +15,7 @@ relogio = pygame.time.Clock()
 rodando = True  #Loop principal do jogo
 percurso = False #True enquanto a flecha estiver em movimento
 fim_percurso = False #True enquanto estiver na posição do final do seu percurso
+gameOver= False #True enquanto jogador nao decidir se continua ou sai depois que perder
 segura_W = False #True enquanto pressionar w
 
 game = 'menu'
@@ -26,6 +27,7 @@ valor_life = 3  #valor da vida do personagem (3 a 0)
 instante = 0 #contador pra movimentar a flecha
 
 # ============== Posições ==================
+larguraTela, alturaTela = 1200, 600
 flecha_X, flecha_Y = 100, 300
 arco_X, arco_Y = 100, 300
 pessoa_X, pessoa_Y = 1000, 390
@@ -86,19 +88,19 @@ pessoa_group.add(pessoa)
 maca_group.add(maca)
     
 # ===============   FUNÇÕES   ===============
-def botao(pos_X, pos_Y, comp, larg, image1, image2, valor):
+def botao():
+    pos_X, pos_Y = 153, 310
+    comp, larg = 227, 83
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
     
     if pos_X+comp > mouse[0] > pos_X and pos_Y+larg > mouse[1] > pos_Y:
-        tela.blit(image2, (pos_X, pos_Y))
+        tela.blit(Story_Mode_bright, (pos_X, pos_Y))
         if click[0] == 1:
-            game = valor[0]
-            game2 = valor[1]
-            return game, game2
+            return 'jogo', 'jogo'
 
     else:
-        tela.blit(image1, (pos_X, pos_Y))
+        tela.blit(Story_Mode, (pos_X, pos_Y))
         
 def quitgame():
     pygame.quit()
@@ -137,31 +139,52 @@ def barra_speed(speed):
             pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(max_V-i), Bx, By])
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
-                
+ 
+def gameOver():
+    font = pygame.font.SysFont(None, 25)
+    tela.fill((255,255,255))
+    screen_text = font.render("Game over, use C pra jogar de novo ou Q pra sair", True, (255,0,0))
+    tela.blit(screen_text, [400, 300])
+    pygame.display.update()
+    loop = True   
     
+    while loop == True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                quitgame()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    loop = False
+                if event.key == pygame.K_q:
+                    quitgame()
+                    
+def acertou():
+    font = pygame.font.SysFont(None, 25)
+    tela.fill((255,255,255))
+    screen_text = font.render("Acertou!!", True, (0,255,0))
+    tela.blit(screen_text, [400, 300])
+    pygame.display.update()
+    loop = True   
+    
+    while loop == True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                quitgame()
+            if event.type == pygame.KEYDOWN:
+                    loop = False
+ 
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-     
+       
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
-            rodando = False
-            
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                segura_W  = False
-        
+            quitgame()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 if valor_speed < max_V and fim_percurso == False: 
                     segura_W = True
 
-            elif event.key == pygame.K_SPACE:
-                    if fim_percurso == False:
-                        Vel= 60 + valor_speed
-                        percurso = True
-                        print(valor_speed)
-    
             elif event.key == pygame.K_r:
                 percurso = False
                 fim_percurso = False
@@ -174,7 +197,26 @@ while rodando:
                 game2 = None
                 game = 'menu'
 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:
+                segura_W  = False
+                if fim_percurso == False:
+                    Vel= 60 + valor_speed
+                    percurso = True
+                    print(valor_speed)
+    
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
+    if valor_life == 0:
+        gameOver()
+        valor_life = 3
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
+    
     if percurso == True:
         if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
             pos_flecha = atirar(Vel,math.pi/6)
@@ -192,9 +234,18 @@ while rodando:
             valor_life -= 1
         percurso=False
         flecha.rect.centerx=1000    
-  
+
     if pygame.sprite.spritecollide(flecha,maca_group,False):
         fim_percurso = True
+        acertou()
+        valor_life = 3
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
         if flecha.rect.centery>100:
             percurso=False
             flecha.rect.centerx=1000
@@ -203,7 +254,7 @@ while rodando:
     if game2 == None:
         if game == 'menu':
             tela.blit(fundo_menu, (0,0))
-            game2 = botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo', 'jogo'])
+            game2 = botao()
         elif game == 'jogo':
             tela.blit(fundo_jogo, (0,0))
     else:
@@ -213,7 +264,6 @@ while rodando:
         flecha_group.draw(tela) # Pinta a imagem do grupo na tela auxiliar.
         arco_group.draw(tela)
         pessoa_group.draw(tela)
-        maca_group.draw(tela)
-            
+        maca_group.draw(tela)    
     pygame.display.update()
 pygame.display.quit()
