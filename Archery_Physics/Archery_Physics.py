@@ -14,12 +14,14 @@ Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
 relogio = pygame.time.Clock()   
 rodando = True
 percurso = False
+fim_percurso = False
 game = 'menu'
 game2 = None    
 
 incremento_V = 0
+max_incremento_V = 20
 valor_speed = 1
-valor_life = 5
+valor_life = 3
 instante = 0
 
 # ============== Posições ==================
@@ -114,14 +116,13 @@ def atirar(Vo, teta):
         Y = flecha_Y -Voy*t + (g/2)*t**2
         posicoes.append([int(X),int(Y)])
         t += 1
-    print(posicoes)
     return posicoes       
     
 def barra_vida(life):
- #5 = vida cheia, 0 = morto
-    Lx, Ly = 50,100 #Posição inicial da barra de vida
-    Bx, By = 20, 20 # Largura e Altura dos 6 blocos da barra de vida
-    for i in range (0,5):
+ #3 = vida cheia, 0 = morto
+    Lx, Ly = 900,50 #Posição inicial da barra de vida
+    Bx, By = 80, 20 # Largura e Altura dos 6 blocos da barra de vida
+    for i in range (0,3):
         if i < life:
             pygame.draw.rect(tela,(0,255,0), [Lx+Bx*i, Ly, Bx, By])
         else:
@@ -129,13 +130,14 @@ def barra_vida(life):
 
 def barra_speed(speed):
  #20 = mais rapido, 0 = mais lento
-    Lx, Ly = 25,200 #Posição inicial da barra de velocidade
+    Lx, Ly = 25,300 #Posição inicial da barra de velocidade
     Bx, By = 20, 20 #Largura e Altura dos bloco da vida
     for i in range (0,20):
         if i < speed:
             pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(9-i), Bx, By])
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(9-i), Bx, By])
+                
     
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
@@ -146,23 +148,23 @@ while rodando:
             rodando = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if valor_speed < 20: # 20 é o máximo de incrementos pra velocidade
+                if valor_speed < max_incremento_V and fim_percurso == False: # 20 é o máximo de incrementos pra velocidade
                     incremento_V += 5
                     valor_speed +=1
-                    print(incremento_V)
 
             elif event.key == pygame.K_SPACE:
-                Vo= 60 + incremento_V
-                percurso = True
+                    if fim_percurso == False:
+                        Vo= 60 + incremento_V
+                        percurso = True
     
             elif event.key == pygame.K_r:
+                percurso = False
+                fim_percurso = False
                 flecha.rect.centerx = 100
                 flecha.rect.centery = 300
+                instante = 0
                 incremento_V = 0
                 valor_speed = 1
-                valor_life = 5
-                instante = 0
-                percurso = False
                 
             elif event.key == pygame.K_ESCAPE:
                 game2 = None
@@ -178,14 +180,18 @@ while rodando:
             instante += 1
 
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
+        fim_percurso = True
+        if percurso == True:
+            valor_life -= 1
         percurso=False
-        flecha.rect.centerx=1000
+        flecha.rect.centerx=1000    
   
     if pygame.sprite.spritecollide(flecha,maca_group,False):
-       if flecha.rect.centery>100:
+        fim_percurso = True
+        if flecha.rect.centery>100:
             percurso=False
             flecha.rect.centerx=1000
-
+        
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
     if game2 == None:
         if game == 'menu':
