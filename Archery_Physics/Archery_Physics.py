@@ -128,10 +128,10 @@ def barra_vida(life):
             pygame.draw.rect(tela,(255,0,0), [Lx+Bx*i, Ly, Bx, By])
 
 def barra_speed(speed):
- #9 = mais rapido, 0 = mais lento
+ #20 = mais rapido, 0 = mais lento
     Lx, Ly = 25,200 #Posição inicial da barra de velocidade
     Bx, By = 20, 20 #Largura e Altura dos bloco da vida
-    for i in range (0,9):
+    for i in range (0,20):
         if i < speed:
             pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(9-i), Bx, By])
         else:
@@ -146,7 +146,7 @@ while rodando:
             rodando = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if valor_speed < 9: # 9 é o máximo de incrementos pra velocidade
+                if valor_speed < 20: # 20 é o máximo de incrementos pra velocidade
                     incremento_V += 5
                     valor_speed +=1
                     print(incremento_V)
