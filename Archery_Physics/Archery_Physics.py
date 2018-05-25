@@ -3,48 +3,6 @@ import time
 import math
 from pygame.locals import *
 
-# ===============   INICIALIZAÇÃO   ===============
-pygame.init()
-tela = pygame.display.set_mode((1200,600), 0,32)
-pygame.display.set_caption('Archery Physics')
-
-fundo_menu = pygame.image.load('fundo_menu.png').convert()
-fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
-fundo_tutorial = pygame.image.load("fundo_tutorial.png")
-
-Game_Over = pygame.image.load("Game_Over.png")
-You_Win = pygame.image.load("You_Win.png")
-
-Story_Mode = pygame.image.load("Story-Mode_227x83.png")
-Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
-
-Tutorial = pygame.image.load("Tutorial.png")
-Tutorial_bright = pygame.image.load("Tutorial_bright.png")
-
-Menu = pygame.image.load("Menu.png")
-Menu_bright = pygame.image.load("Menu_bright.png")
-
-Jogar_Novamente = pygame.image.load("Jogar_Novamente.png")
-Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_bright.png")
-
-Next_Level = pygame.image.load("Next_Level.png")
-Next_Level_bright = pygame.image.load("Next_Level_bright.png")
-
-font = pygame.font.SysFont(None, 25)
-
-relogio = pygame.time.Clock()   
-rodando = True  #Loop principal do jogo
-percurso = False #True enquanto a flecha estiver em movimento
-fim_percurso = False #True enquanto estiver na posição do final do seu percurso
-gameOver= False #True enquanto jogador nao decidir se continua ou sai depois que perder
-segura_W = False #True enquanto pressionar w
-recomeca = False # True pra reinciar a flecha
-
-max_V = 100 #máxima incremento a velocidade inicial(Vo = 60)
-valor_speed = 1 #valor da velocidade mostrada na barra (1 a 100)
-valor_life = 3  #valor da vida do personagem (3 a 0)
-instante = 0 #contador pra movimentar a flecha
-
 # ============== Posições ==================
 larguraTela, alturaTela = 1200, 600
 flecha_X, flecha_Y = 100, 300
@@ -52,28 +10,61 @@ arco_X, arco_Y = 100, 300
 pessoa_X, pessoa_Y = 1000, 390
 maca_X, maca_Y = 1000, 180
 
+# ===============   INICIALIZAÇÃO   ===============
+pygame.init()
+tela = pygame.display.set_mode((larguraTela,alturaTela), 0,32)
+pygame.display.set_caption('Archery Physics')
+font = pygame.font.SysFont(None, 25)
+relogio = pygame.time.Clock()   
+
+# ===============   Imagens   ===============
+fundo_menu = pygame.image.load('fundo_menu.png').convert()
+fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
+fundo_tutorial = pygame.image.load("fundo_tutorial.png")
+Game_Over = pygame.image.load("Game_Over.png")
+You_Win = pygame.image.load("You_Win.png")
+Story_Mode = pygame.image.load("Story-Mode_227x83.png")
+Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
+Tutorial = pygame.image.load("Tutorial.png")
+Tutorial_bright = pygame.image.load("Tutorial_bright.png")
+Menu = pygame.image.load("Menu.png")
+Menu_bright = pygame.image.load("Menu_bright.png")
+Jogar_Novamente = pygame.image.load("Jogar_Novamente.png")
+Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_bright.png")
+Next_Level = pygame.image.load("Next_Level.png")
+Next_Level_bright = pygame.image.load("Next_Level_bright.png")
+
+# ===============   Variáveis   ===============
+rodando = True  #Loop principal do jogo
+fim_percurso = False #True enquanto estiver na posição do final do seu percurso
+percurso = False #True enquanto a flecha estiver em movimento
+gameOver= False #True enquanto jogador nao decidir se continua ou sai depois que perder
+segura_W = False #True enquanto pressionar w
+recomeca = False # True pra reinciar a flecha
+
+modos = {'jogo' : 0, 'tutorial' : 0, 'game_over' : 0, 'jogar_dnv' : 0, 'menu' : 0, 'win' : 0}
+max_V = 100 #máxima incremento a velocidade inicial(Vo = 60)
+valor_speed = 1 #valor da velocidade mostrada na barra (1 a 100)
+valor_life = 3  #valor da vida do personagem (3 a 0)
+instante = 0 #contador pra movimentar a flecha
+
 # ============== Classes ==================
 class Flecha(pygame.sprite.Sprite):
-  def __init__(self, arquivo_imagem, pos_x, pos_y, vel_x, vel_y):
+  def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
-    self.vx = vel_x
-    self.vy = vel_y
     self.image = pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
     self.rect.centery = pos_y
-    
+ 
 class Arco(pygame.sprite.Sprite):
-  def __init__(self, arquivo_imagem, pos_x, pos_y, start_angle):
+  def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
-    self.original= pygame.image.load(arquivo_imagem)
-    self.rotate (start_angle)
+    self.image= pygame.image.load(arquivo_imagem)
     self.rect = self.image.get_rect()
     self.rect.centerx = pos_x
     self.rect.centery = pos_y
-  def rotate(self, angle):
-    self.image = pygame.transform.rotate(self.original, angle)
-
+    
 class Pessoa(pygame.sprite.Sprite):
   def __init__(self, arquivo_imagem, pos_x, pos_y):
     pygame.sprite.Sprite.__init__(self)
@@ -91,8 +82,8 @@ class Maca(pygame.sprite.Sprite):
     self.rect.centery = pos_y
 
 # ===============   Sprites e Grupos   ===============
-flecha = Flecha("flecha.png", flecha_X,flecha_Y,0,0)
-arco = Arco("arco.png", arco_X, arco_Y, 0)
+flecha = Flecha("flecha.png", flecha_X,flecha_Y)
+arco = Arco("arco.png", arco_X, arco_Y)
 pessoa = Pessoa("pessoa1.png", pessoa_X, pessoa_Y)
 maca = Maca("maca.png",maca_X, maca_Y)
 
@@ -107,15 +98,6 @@ pessoa_group.add(pessoa)
 maca_group.add(maca)
     
 # ===============   FUNÇÕES   ===============
-modos = {
-    'jogo' : 0,
-    'tutorial' : 0,
-    'game_over' : 0,
-    'jogar_dnv' : 0,
-    'menu' : 0,
-    'win' : 0,
-        }
-
 def botao(pos_X, pos_Y, image1, image2, arg, arg2):
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
@@ -144,7 +126,7 @@ def atirar(Vo, teta):
     posicoes = []
     X = flecha_X
     Y = flecha_Y
-    while X < 1200 and Y < 600:
+    while X < larguraTela and Y < alturaTela:
         X = flecha_X + Vox*t
         Y = flecha_Y -Voy*t + (g/2)*t**2
         posicoes.append([int(X),int(Y)])
@@ -154,7 +136,7 @@ def atirar(Vo, teta):
 def barra_vida(life):
  #3 = vida cheia, 0 = morto
     Lx, Ly = 900,50 #Posição inicial da barra de vida
-    Bx, By = 80, 20 # Largura e Altura dos 6 blocos da barra de vida
+    Bx, By = 80, 20 # Largura e Altura dos 4 blocos da barra de vida
     for i in range (0,3):
         if i < life:
             pygame.draw.rect(tela,(0,255,0), [Lx+Bx*i, Ly, Bx, By])
@@ -173,16 +155,16 @@ def barra_speed(speed):
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-      
-    if recomeca == True:
+    if recomeca == True: #Recomeça a partida
+        recomeca = False
         percurso = False
         fim_percurso = False
         flecha.rect.centerx = 100
         flecha.rect.centery = 300
         valor_speed = 1
         instante = 0
-        recomeca = False
-    
+        
+    # ---------  Eventos  ---------
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             quitgame()
@@ -203,29 +185,35 @@ while rodando:
                 if fim_percurso == False:
                     Vel= 60 + valor_speed
                     percurso = True
-                    print(valor_speed)
     
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
-    if valor_life == 0:
+    if valor_life == 0:     #Se vida = 0 -> Gameover, recomeça e enche a vida
         modos['game_over'] = 1
         valor_life = 3
         recomeca = True
         
-    if fim_percurso == True:
+    if fim_percurso == True: #Espera 1 seg. e recomeça se a flecha estiver no fim do percurso
         time.sleep(1)
         recomeca = True
         
-    if percurso == True:
+    if percurso == True: #Calcula a trajetoria da flecha e move ela pela tela
         if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
             pos_flecha = atirar(Vel,math.pi/6)
         if instante < len(pos_flecha): #Move a flecha pela trajetoria calculada
-            flecha.rect.centerx = pos_flecha[instante][0]
-            flecha.rect.centery = pos_flecha[instante][1]
-            instante += 1
+            fx = pos_flecha[instante][0]
+            fy = pos_flecha[instante][1]
+            if fx < larguraTela and fy < alturaTela:
+                flecha.rect.centerx = fx
+                flecha.rect.centery = fy
+                instante += 1
+            else:
+                fim_percurso = True
 
-    if segura_W == True:
+
+    if segura_W == True: # Enquanto o botão estiver pressionado adiciona 2 ao valor da velocidade
         valor_speed +=2
-        
+ 
+    
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
         fim_percurso = True
         if percurso == True:
