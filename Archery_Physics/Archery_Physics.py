@@ -15,7 +15,6 @@ fundo_Game_Over = pygame.image.load("Game_Over.png")
 
 Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
-font = pygame.font.SysFont(None, 25)
 
 Tutorial = pygame.image.load("Tutorial.png")
 Tutorial_bright = pygame.image.load("Tutorial_bright.png")
@@ -102,7 +101,6 @@ pessoa_group.add(pessoa)
 maca_group.add(maca)
     
 # ===============   FUNÇÕES   ===============
-<<<<<<< HEAD
 modos = {
     'jogo' : 0,
     'tutorial' : 0,
@@ -112,28 +110,18 @@ modos = {
         }
 
 def botao(pos_X, pos_Y, comp, larg, image1, image2, arg, arg2):
-=======
-def botao():
-    pos_X, pos_Y = 153, 310
-    comp, larg = 227, 83
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
     
     if pos_X+comp > mouse[0] > pos_X and pos_Y+larg > mouse[1] > pos_Y:
-        tela.blit(Story_Mode_bright, (pos_X, pos_Y))
+        tela.blit(image2, (pos_X, pos_Y))
         if click[0] == 1:
-<<<<<<< HEAD
             i = 0
             while i < len(arg):
                 modos[arg[i]] = arg2[i]
                 i += 1
-=======
-            return 'jogo', 'jogo'
-
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
     else:
-        tela.blit(Story_Mode, (pos_X, pos_Y))
+        tela.blit(image1, (pos_X, pos_Y))
         
 def quitgame():
     pygame.quit()
@@ -173,26 +161,6 @@ def barra_speed(speed):
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
  
-<<<<<<< HEAD
-=======
-def gameOver():
-    tela.fill((255,255,255))
-    screen_text = font.render("Game over, use C pra jogar de novo ou Q pra sair", True, (255,0,0))
-    tela.blit(screen_text, [400, 300])
-    pygame.display.update()
-    loop = True   
-    
-    while loop == True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
-                quitgame()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_c:
-                    loop = False
-                if event.key == pygame.K_q:
-                    quitgame()
-                    
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
 def acertou():
     tela.fill((255,255,255))
     screen_text = font.render("Acertou!!", True, (0,255,0))
@@ -227,11 +195,7 @@ while rodando:
     
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
     if valor_life == 0:
-<<<<<<< HEAD
         modos['game_over'] = 1
-=======
-        gameOver()
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
         valor_life = 3
         percurso = False
         fim_percurso = False
@@ -282,26 +246,15 @@ while rodando:
             flecha.rect.centerx=1000
         
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
-<<<<<<< HEAD
     
     if modos['jogo'] == 1:
         tela.blit(fundo_jogo, (0,0))
-=======
-    if game2 == None:
-        if game == 'menu':
-            tela.blit(fundo_menu, (0,0))
-            game2 = botao()
-        elif game == 'jogo':
-            tela.blit(fundo_jogo, (0,0))
-    else:
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
         tela.blit(fundo_jogo, (0,0))
         barra_vida(valor_life)
         barra_speed(valor_speed)
         flecha_group.draw(tela)
         arco_group.draw(tela)
         pessoa_group.draw(tela)
-<<<<<<< HEAD
         maca_group.draw(tela)
         
         if modos['game_over'] == 1:
@@ -319,8 +272,5 @@ while rodando:
         botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo'], [1])
         botao(480, 310, 227, 83, Tutorial, Tutorial_bright, ['tutorial'], [1])    
         
-=======
-        maca_group.draw(tela)    
->>>>>>> df44d5c005620c85e7d8a000bc8144f94b186389
     pygame.display.update()
 pygame.display.quit()
