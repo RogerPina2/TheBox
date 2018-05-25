@@ -1,4 +1,5 @@
 import pygame
+import time
 import math
 from pygame.locals import *
 
@@ -6,19 +7,32 @@ from pygame.locals import *
 pygame.init()
 tela = pygame.display.set_mode((1200,600), 0,32)
 pygame.display.set_caption('Archery Physics')
+
 fundo_menu = pygame.image.load('fundo_menu.png').convert()
 fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
+fundo_tutorial = pygame.image.load("fundo_tutorial.png")
+fundo_Game_Over = pygame.image.load("Game_Over.png")
+
 Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
+
+Tutorial = pygame.image.load("Tutorial.png")
+Tutorial_bright = pygame.image.load("Tutorial_bright.png")
+
+Menu = pygame.image.load("Menu.png")
+Menu_bright = pygame.image.load("Menu_bright.png")
+
+Jogar_Novamente = pygame.image.load("Jogar_Novamente.png")
+Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_bright.png")
+
+font = pygame.font.SysFont(None, 25)
 
 relogio = pygame.time.Clock()   
 rodando = True  #Loop principal do jogo
 percurso = False #True enquanto a flecha estiver em movimento
 fim_percurso = False #True enquanto estiver na posição do final do seu percurso
+gameOver= False #True enquanto jogador nao decidir se continua ou sai depois que perder
 segura_W = False #True enquanto pressionar w
-
-game = 'menu'
-game2 = None    
 
 max_V = 100 #máxima incremento a velocidade inicial(Vo = 60)
 valor_speed = 1 #valor da velocidade mostrada na barra (1 a 100)
@@ -26,6 +40,7 @@ valor_life = 3  #valor da vida do personagem (3 a 0)
 instante = 0 #contador pra movimentar a flecha
 
 # ============== Posições ==================
+larguraTela, alturaTela = 1200, 600
 flecha_X, flecha_Y = 100, 300
 arco_X, arco_Y = 100, 300
 pessoa_X, pessoa_Y = 1000, 390
@@ -86,17 +101,25 @@ pessoa_group.add(pessoa)
 maca_group.add(maca)
     
 # ===============   FUNÇÕES   ===============
-def botao(pos_X, pos_Y, comp, larg, image1, image2, valor):
+modos = {
+    'jogo' : 0,
+    'tutorial' : 0,
+    'game_over' : 0,
+    'jogar_dnv' : 0,
+    'menu' : 0,
+        }
+
+def botao(pos_X, pos_Y, comp, larg, image1, image2, arg, arg2):
     mouse = pygame.mouse.get_pos() 
     click = pygame.mouse.get_pressed()
     
     if pos_X+comp > mouse[0] > pos_X and pos_Y+larg > mouse[1] > pos_Y:
         tela.blit(image2, (pos_X, pos_Y))
         if click[0] == 1:
-            game = valor[0]
-            game2 = valor[1]
-            return game, game2
-
+            i = 0
+            while i < len(arg):
+                modos[arg[i]] = arg2[i]
+                i += 1
     else:
         tela.blit(image1, (pos_X, pos_Y))
         
@@ -137,44 +160,59 @@ def barra_speed(speed):
             pygame.draw.rect(tela,(0,0,255), [Lx, Ly+By*(max_V-i), Bx, By])
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
-                
+ 
+def acertou():
+    tela.fill((255,255,255))
+    screen_text = font.render("Acertou!!", True, (0,255,0))
+    tela.blit(screen_text, [600, 300])
+    pygame.display.update()
+    loop = True   
+    time.sleep(2)
     
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
-     
+       
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
-            rodando = False
-            
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                segura_W  = False
-        
+            quitgame()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 if valor_speed < max_V and fim_percurso == False: 
                     segura_W = True
-
-            elif event.key == pygame.K_SPACE:
-                    if fim_percurso == False:
-                        Vel= 60 + valor_speed
-                        percurso = True
-                        print(valor_speed)
-    
-            elif event.key == pygame.K_r:
-                percurso = False
-                fim_percurso = False
-                flecha.rect.centerx = 100
-                flecha.rect.centery = 300
-                instante = 0
-                valor_speed = 1
                 
             elif event.key == pygame.K_ESCAPE:
-                game2 = None
-                game = 'menu'
+                modos['jogo'] = 0
+                modos['tutorial'] = 0
 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:
+                segura_W  = False
+                if fim_percurso == False:
+                    Vel= 60 + valor_speed
+                    percurso = True
+                    print(valor_speed)
+    
     # === SEGUNDA PARTE: LÓGICA DO JOGO ===
+    if valor_life == 0:
+        modos['game_over'] = 1
+        valor_life = 3
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
+    if fim_percurso == True:
+        time.sleep(1)
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
     if percurso == True:
         if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
             pos_flecha = atirar(Vel,math.pi/6)
@@ -192,28 +230,47 @@ while rodando:
             valor_life -= 1
         percurso=False
         flecha.rect.centerx=1000    
-  
+
     if pygame.sprite.spritecollide(flecha,maca_group,False):
         fim_percurso = True
+        acertou()
+        valor_life = 3
+        percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
         if flecha.rect.centery>100:
             percurso=False
             flecha.rect.centerx=1000
         
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
-    if game2 == None:
-        if game == 'menu':
-            tela.blit(fundo_menu, (0,0))
-            game2 = botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo', 'jogo'])
-        elif game == 'jogo':
-            tela.blit(fundo_jogo, (0,0))
-    else:
+    
+    if modos['jogo'] == 1:
+        tela.blit(fundo_jogo, (0,0))
         tela.blit(fundo_jogo, (0,0))
         barra_vida(valor_life)
         barra_speed(valor_speed)
-        flecha_group.draw(tela) # Pinta a imagem do grupo na tela auxiliar.
+        flecha_group.draw(tela)
         arco_group.draw(tela)
         pessoa_group.draw(tela)
         maca_group.draw(tela)
-            
+        
+        if modos['game_over'] == 1:
+            flecha_group.draw(tela)
+            tela.blit(fundo_Game_Over, (301,151))
+            botao(350, 310, 227, 83, Menu, Menu_bright, ['jogo','game_over'], [0,0])
+            botao(625, 310, 227, 83, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
+    
+    elif modos['tutorial'] == 1:
+        tela.blit(fundo_tutorial, (0,0))
+        botao(485, 480, 227, 83, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
+ 
+    else: 
+        tela.blit(fundo_menu, (0,0))
+        botao(153, 310, 227, 83, Story_Mode, Story_Mode_bright, ['jogo'], [1])
+        botao(480, 310, 227, 83, Tutorial, Tutorial_bright, ['tutorial'], [1])    
+        
     pygame.display.update()
 pygame.display.quit()
