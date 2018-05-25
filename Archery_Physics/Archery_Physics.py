@@ -1,4 +1,5 @@
 import pygame
+import time
 import math
 from pygame.locals import *
 
@@ -10,6 +11,7 @@ fundo_menu = pygame.image.load('fundo_menu.png').convert()
 fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
 Story_Mode = pygame.image.load("Story-Mode_227x83.png")
 Story_Mode_bright = pygame.image.load("Story-Mode_bright_227x83.png")
+font = pygame.font.SysFont(None, 25)
 
 relogio = pygame.time.Clock()   
 rodando = True  #Loop principal do jogo
@@ -141,7 +143,6 @@ def barra_speed(speed):
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
  
 def gameOver():
-    font = pygame.font.SysFont(None, 25)
     tela.fill((255,255,255))
     screen_text = font.render("Game over, use C pra jogar de novo ou Q pra sair", True, (255,0,0))
     tela.blit(screen_text, [400, 300])
@@ -159,20 +160,13 @@ def gameOver():
                     quitgame()
                     
 def acertou():
-    font = pygame.font.SysFont(None, 25)
     tela.fill((255,255,255))
     screen_text = font.render("Acertou!!", True, (0,255,0))
-    tela.blit(screen_text, [400, 300])
+    tela.blit(screen_text, [600, 300])
     pygame.display.update()
     loop = True   
+    time.sleep(2)
     
-    while loop == True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
-                quitgame()
-            if event.type == pygame.KEYDOWN:
-                    loop = False
- 
 # ===============   LOOPING PRINCIPAL   ===============
 while rodando:
     tempo = relogio.tick(15)
@@ -184,14 +178,6 @@ while rodando:
             if event.key == pygame.K_w:
                 if valor_speed < max_V and fim_percurso == False: 
                     segura_W = True
-
-            elif event.key == pygame.K_r:
-                percurso = False
-                fim_percurso = False
-                flecha.rect.centerx = 100
-                flecha.rect.centery = 300
-                instante = 0
-                valor_speed = 1
                 
             elif event.key == pygame.K_ESCAPE:
                 game2 = None
@@ -216,7 +202,15 @@ while rodando:
         instante = 0
         valor_speed = 1
         
-    
+    if fim_percurso == True:
+        time.sleep(1)
+        percurso = False
+        fim_percurso = False
+        flecha.rect.centerx = 100
+        flecha.rect.centery = 300
+        instante = 0
+        valor_speed = 1
+        
     if percurso == True:
         if instante == 0: #Calcula a trajetoria da flecha se ainda não foi calculada
             pos_flecha = atirar(Vel,math.pi/6)
@@ -240,7 +234,6 @@ while rodando:
         acertou()
         valor_life = 3
         percurso = False
-        fim_percurso = False
         flecha.rect.centerx = 100
         flecha.rect.centery = 300
         instante = 0
