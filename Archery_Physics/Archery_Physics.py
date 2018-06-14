@@ -5,18 +5,19 @@ from pygame.locals import *
 
 # ============== Posições ==================
 larguraTela, alturaTela = 1200, 600
-flecha_X, flecha_Y = 100, 300
-arco_X, arco_Y = 100, 300
-pessoa_X, pessoa_Y = 1000, 390
-maca_X, maca_Y = 1000, 180
+flecha_X, flecha_Y = 110, 420
+arco_X, arco_Y = 120, 420
+pessoa_X, pessoa_Y = 1000, 450
+maca_X, maca_Y = 1000, 330
 
 # ===============   INICIALIZAÇÃO   ===============
 pygame.init()
+pygame.mixer.music.load("song.wav")
 tela = pygame.display.set_mode((larguraTela,alturaTela), 0,32)
 pygame.display.set_caption('Archery Physics')
 font = pygame.font.SysFont(None, 25)
 relogio = pygame.time.Clock()   
-
+ 
 # ===============   Imagens   ===============
 fundo_menu = pygame.image.load('fundo_menu.png').convert()
 fundo_jogo = pygame.image.load("fundo 3.jpg").convert()
@@ -157,14 +158,16 @@ def barra_speed(speed):
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
  
 # ===============   LOOPING PRINCIPAL   ===============
+
+pygame.mixer.music.play(-1)
 while rodando:
     tempo = relogio.tick(15)
     if recomeca == True: #Recomeça a partida
         recomeca = False
         percurso = False
         fim_percurso = False
-        flecha.rect.centerx = 100
-        flecha.rect.centery = 300
+        flecha.rect.centerx = flecha_X
+        flecha.rect.centery = flecha_Y
         valor_speed = 1
         instante = 0
         
@@ -219,7 +222,6 @@ while rodando:
     if segura_W == True: # Enquanto o botão estiver pressionado adiciona 2 ao valor da velocidade
         valor_speed +=2
  
-    
     if pygame.sprite.spritecollide(flecha,pessoa_group,False):
         fim_percurso = True
         if percurso == True:
