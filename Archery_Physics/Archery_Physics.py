@@ -1,6 +1,7 @@
 import pygame
 import time
 import math
+import random
 from pygame.locals import *
 
 # ============== Posições ==================
@@ -127,6 +128,12 @@ def atirar(Vo, teta):
     g = 10
     Voy = Vo*math.sin(teta)
     Vox = Vo*math.cos(teta)
+    
+    #Quando machuca o amigo, vc fica com medo e sua inacuracia aumenta
+    print(teta)
+    inac = random.randint(0,100)*0.01*(4-valor_life)
+    ang = inac*teta
+    print(ang)
     t = 0
     posicoes = []
     X = flecha_X
@@ -177,17 +184,20 @@ while rodando:
             quitgame()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if valor_speed < max_V and fim_percurso == False: 
+                if valor_speed < max_V and fim_percurso == False and modos['game_over'] == 0 and modos['win'] == 0: 
                     segura_W = True
                 
             elif event.key == pygame.K_ESCAPE:
                 modos['jogo'] = 0
                 modos['tutorial'] = 0
+                modos['game_over'] = 0
+                modos['win'] = 0 
                 recomeca = True
                 valor_life = 3
+                numero_de_flechas = 5
                 
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
+            if event.key == pygame.K_w and modos['game_over'] == 0 and modos['win'] == 0: 
                 segura_W  = False
                 if fim_percurso == False:
                     Vel= 60 + valor_speed
@@ -269,7 +279,7 @@ while rodando:
         if modos['game_over'] == 1:
             flecha_group.draw(tela)
             tela.blit(Game_Over, (301,151))
-            botao(350, 310, Menu, Menu_bright, ['jogo','game_over'], [0,0])
+            botao(350, 310, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
             botao(625, 310, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
             
         elif modos['win'] == 1:
