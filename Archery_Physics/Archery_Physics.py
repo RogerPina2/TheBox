@@ -32,7 +32,7 @@ Tutorial_bright = pygame.image.load("Tutorial_bright.png")
 Menu = pygame.image.load("Menu.png")
 Menu_bright = pygame.image.load("Menu_bright.png")
 Jogar_Novamente = pygame.image.load("Jogar_Novamente.png")
-Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_bright.png")
+Jogar_Novamente_bright = pygame.image.load("Jogar_Novamente_BRIGHT.png")
 Next_Level = pygame.image.load("Next_Level.png")
 Next_Level_bright = pygame.image.load("Next_Level_bright.png")
 Mini_Flecha = pygame.image.load("Mini_Flecha.png")
@@ -53,45 +53,20 @@ instante = 0 #contador pra movimentar a flecha
 numero_de_flechas = 5 #Numero de flechas do jogador
 
 # ============== Classes ==================
-class Flecha(pygame.sprite.Sprite):
-   def __init__(self, arquivo_imagem, pos_x, pos_y):
-     pygame.sprite.Sprite.__init__(self)
-     self.image = pygame.image.load(arquivo_imagem)
-     self.rect = self.image.get_rect()
-     self.rect.centerx = pos_x
-     self.rect.centery = pos_y
-  
-class Arco(pygame.sprite.Sprite):
-   def __init__(self, arquivo_imagem, pos_x, pos_y):
-     pygame.sprite.Sprite.__init__(self)
-     self.image= pygame.image.load(arquivo_imagem)
-     self.rect = self.image.get_rect()
-     self.rect.centerx = pos_x
-     self.rect.centery = pos_y
-     
-
-class Pessoa(pygame.sprite.Sprite):
-   def __init__(self, arquivo_imagem, pos_x, pos_y):
-     pygame.sprite.Sprite.__init__(self)
-     self.image= pygame.image.load(arquivo_imagem)
-     self.rect = self.image.get_rect()
-     self.rect.centerx = pos_x
-     self.rect.centery = pos_y
- 
-class Maca(pygame.sprite.Sprite):
-  def __init__(self, arquivo_imagem, pos_x, pos_y):
-    pygame.sprite.Sprite.__init__(self)
-    self.image= pygame.image.load(arquivo_imagem)
-    self.rect = self.image.get_rect()
-    self.rect.centerx = pos_x
-    self.rect.centery = pos_y
+class Elemento(pygame.sprite.Sprite):
+    def __init__(self, arquivo_imagem, pos_x, pos_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = pos_x
+        self.rect.centery = pos_y
  
  # ===============   Sprites e Grupos   ===============
 
-flecha = Flecha("flecha.png", flecha_X,flecha_Y)
-arco = Arco("arco.png", arco_X, arco_Y)
-pessoa = Pessoa("pessoa1.png", pessoa_X, pessoa_Y)
-maca = Maca("maca.png",maca_X, maca_Y)
+flecha = Elemento("flecha.png", flecha_X,flecha_Y)
+arco = Elemento("arco.png", arco_X, arco_Y)
+pessoa = Elemento("pessoa1.png", pessoa_X, pessoa_Y)
+maca = Elemento("maca.png",maca_X, maca_Y)
 
 flecha_group = pygame.sprite.Group()
 arco_group = pygame.sprite.Group()
@@ -164,6 +139,32 @@ def barra_speed(speed):
         else:
             pygame.draw.rect(tela,(0,0,0), [Lx, Ly+By*(max_V-i), Bx, By])
  
+def jogar():
+        tela.blit(fundo_jogo, (0,0))
+        tela.blit(fundo_jogo, (0,0))
+        tela.blit(Mini_Flecha, (20,20))
+        barra_vida(valor_life)
+        barra_speed(valor_speed)
+        flecha_group.draw(tela)
+        arco_group.draw(tela)
+        pessoa_group.draw(tela)
+        maca_group.draw(tela)
+        screen_text = font.render('x {0}'.format(numero_de_flechas), True, (0,0,0))
+        tela.blit(screen_text, [70,40])
+        
+        if modos['game_over'] == 1:
+            flecha_group.draw(tela)
+            tela.blit(Game_Over, (301,151))
+            botao(350, 310, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
+            botao(625, 310, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
+            
+        elif modos['win'] == 1:
+            flecha_group.draw(tela)
+            maca_group.draw(tela)
+            tela.blit(You_Win, (301,151))
+            botao(350, 310, Menu, Menu_bright, ['jogo','win'], [0,0])
+            botao(625, 310, Next_Level, Next_Level_bright, ['win'], [0])            
+
 # ===============   LOOPING PRINCIPAL   ===============
 
 pygame.mixer.music.play(-1)
@@ -264,30 +265,7 @@ while rodando:
 # === TERCEIRA PARTE: GERA SAÍDAS (pinta tela, etc) ===
     
     if modos['jogo'] == 1:
-        tela.blit(fundo_jogo, (0,0))
-        tela.blit(fundo_jogo, (0,0))
-        tela.blit(Mini_Flecha, (20,20))
-        barra_vida(valor_life)
-        barra_speed(valor_speed)
-        flecha_group.draw(tela)
-        arco_group.draw(tela)
-        pessoa_group.draw(tela)
-        maca_group.draw(tela)
-        screen_text = font.render('x {0}'.format(numero_de_flechas), True, (0,0,0))
-        tela.blit(screen_text, [70,40])
-        
-        if modos['game_over'] == 1:
-            flecha_group.draw(tela)
-            tela.blit(Game_Over, (301,151))
-            botao(350, 310, Menu, Menu_bright, ['jogo','game_over','tutorial'], [0,0,0])
-            botao(625, 310, Jogar_Novamente, Jogar_Novamente_bright, ['game_over'], [0])
-            
-        elif modos['win'] == 1:
-            flecha_group.draw(tela)
-            maca_group.draw(tela)
-            tela.blit(You_Win, (301,151))
-            botao(350, 310, Menu, Menu_bright, ['jogo','win'], [0,0])
-            botao(625, 310, Next_Level, Next_Level_bright, ['win'], [0])
+        jogar()
         
     elif modos['tutorial'] == 1:
         tela.blit(fundo_tutorial, (0,0))
